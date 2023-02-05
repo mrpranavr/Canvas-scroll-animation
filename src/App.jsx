@@ -4,9 +4,11 @@ import ScrollTrigger from "gsap/ScrollTrigger";
 
 function App() {
     const canvasRef = useRef(null);
+    const divRef = useRef(null);
+    const sec = useRef(null)
 
     useLayoutEffect(() => {
-        gsap.registerPlugin(ScrollTrigger)
+        gsap.registerPlugin(ScrollTrigger);
 
         const canvas = canvasRef.current;
         canvas.height = window.innerHeight;
@@ -40,11 +42,35 @@ function App() {
             ease: "none",
             scrollTrigger: {
                 pin: "canvas",
-                end: "550%",
-                scrub: 0.5
+                end: "500%",
+                scrub: 0.5,
             },
-            onUpdate: render
+            onUpdate: render,
         });
+
+        // Pinning the title div to top
+        gsap.to(divRef.current, {
+            scrollTrigger: {
+                trigger: divRef.current,
+                start: "top top",
+                end: "500%",
+                pin: true,
+                pinSpacing: true,
+            },
+        });
+
+        // Making the title appear only when div about to end
+        let t1 = gsap
+            .timeline({
+                scrollTrigger: {
+                    trigger: sec.current,
+                    start: "bottom-=2000 center",
+                    endTrigger: sec.current,
+                    end: "bottom-=1500 center",
+                    scrub: true,
+                },
+            })
+            .fromTo(divRef.current, { opacity: 0 }, { opacity: 1 });
 
         function render() {
             context.canvas.width = images[i].width;
@@ -57,10 +83,23 @@ function App() {
 
     return (
         <>
-            <div className="h-full w-full">
-                <canvas ref={canvasRef} className="h-[100vh] w-[100vw] object-cover" />
-            </div>
-            <div>Hello</div>
+            <section ref={sec} className="relative">
+                <div className="h-full w-full">
+                    <canvas
+                        ref={canvasRef}
+                        className="h-[100vh] w-[100vw] object-cover"
+                    />
+                </div>
+                <div
+                    ref={divRef}
+                    className="absolute top-0 h-[100vh] w-[100vw] flex items-center justify-center"
+                >
+                    <h1 className="text-[52px] font-bold">The Ball</h1>
+                </div>
+            </section>
+            <section>
+                <div className="h-[100vh]">section-2</div>
+            </section>
         </>
     );
 }
